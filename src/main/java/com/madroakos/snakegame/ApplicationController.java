@@ -28,6 +28,7 @@ public class ApplicationController {
     private final Position fruitPosition = new Position(14, 4);
     private double cellSize;
     private static KeyCode lastKeyDown = KeyCode.RIGHT;
+    private static KeyCode lastRegisteredKey = KeyCode.RIGHT;
     private final Random random = new Random();
     private boolean haveFailed = false;
     private int point;
@@ -55,15 +56,19 @@ public class ApplicationController {
                             switch (lastKeyDown) {
                                 case RIGHT:
                                     temp = new Position(snakePosition.peekLast().getX() + 1, Objects.requireNonNull(snakePosition.peekLast()).getY());
+                                    lastRegisteredKey = KeyCode.RIGHT;
                                     break;
                                 case LEFT:
                                     temp = new Position(snakePosition.peekLast().getX() - 1, Objects.requireNonNull(snakePosition.peekLast()).getY());
+                                    lastRegisteredKey = KeyCode.LEFT;
                                     break;
                                 case UP:
                                     temp = new Position(snakePosition.peekLast().getX(), Objects.requireNonNull(snakePosition.peekLast()).getY() - 1);
+                                    lastRegisteredKey = KeyCode.UP;
                                     break;
                                 case DOWN:
                                     temp = new Position(snakePosition.peekLast().getX(), Objects.requireNonNull(snakePosition.peekLast()).getY() + 1);
+                                    lastRegisteredKey = KeyCode.DOWN;
                                     break;
                                 default:
                                     break;
@@ -127,26 +132,26 @@ public class ApplicationController {
         return random.nextInt(0, gameBoard.getColumnCount());
     }
 
-    public static void setLastKeyDown(KeyCode keyCode) {
-        switch (keyCode) {
+    public static void setLastKeyDown(KeyCode keyCodeToBeSet) {
+        switch (keyCodeToBeSet) {
             case RIGHT:
-                if (lastKeyDown != KeyCode.LEFT) {
-                    lastKeyDown = keyCode;
+                if (lastRegisteredKey != KeyCode.LEFT) {
+                    lastKeyDown = keyCodeToBeSet;
                 }
                 break;
             case LEFT:
-                if (lastKeyDown != KeyCode.RIGHT) {
-                    lastKeyDown = keyCode;
+                if (lastRegisteredKey != KeyCode.RIGHT) {
+                    lastKeyDown = keyCodeToBeSet;
                 }
                 break;
             case UP:
-                if (lastKeyDown != KeyCode.DOWN) {
-                    lastKeyDown = keyCode;
+                if (lastRegisteredKey != KeyCode.DOWN) {
+                    lastKeyDown = keyCodeToBeSet;
                 }
                 break;
             case DOWN:
-                if (lastKeyDown != KeyCode.UP) {
-                    lastKeyDown = keyCode;
+                if (lastRegisteredKey != KeyCode.UP) {
+                    lastKeyDown = keyCodeToBeSet;
                 }
                 break;
         }

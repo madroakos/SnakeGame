@@ -11,11 +11,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
-
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 
 public class ApplicationController {
     @FXML
@@ -25,13 +21,14 @@ public class ApplicationController {
     @FXML
     private Label pointLabel;
     private final Deque<Position> snakePosition = new ArrayDeque<>();
-    private final Position fruitPosition = new Position(14, 4);
+    private final Position fruitPosition = new Position(5, 5);
     private double cellSize;
     private static KeyCode lastKeyDown = KeyCode.RIGHT;
     private static KeyCode lastRegisteredKey = KeyCode.RIGHT;
     private final Random random = new Random();
     private boolean haveFailed = false;
     private int point;
+    private final Set<Position> allPositions = new HashSet<>();
 
     public ApplicationController() {
         fillStartingPosition();
@@ -74,7 +71,7 @@ public class ApplicationController {
                                     break;
                             }
                             if (temp != null && inBoundary(temp.getX(), temp.getY())) {
-                                for (Position p :snakePosition) {
+                                for (Position p : snakePosition) {
                                     if (p.getX() == temp.getX() && p.getY() == temp.getY()) {
                                         haveFailed = true;
                                         break;
@@ -83,17 +80,14 @@ public class ApplicationController {
                                     snakePosition.add(temp);
                                     if (Objects.requireNonNull(snakePosition.peekLast()).getX() == fruitPosition.getX() && (snakePosition.peekLast() != null ? snakePosition.peekLast().getY() : 0) == fruitPosition.getY()) {
                                         clearCell(fruitPosition.getX(), fruitPosition.getY());
-                                        fruitPosition.setPosition(generatePosition(), generatePosition());
-                                        putDownFruit(fruitPosition.getX(), fruitPosition.getY());
+                                        putDownFruit();
                                         point++;
                                         pointLabel.setText(String.valueOf(point));
-                                        fillWithSnake(Objects.requireNonNull(snakePosition.peekLast()).getX(), Objects.requireNonNull(snakePosition.peekLast()).getY());
                                     } else {
                                         clearCell(Objects.requireNonNull(snakePosition.peekFirst()).getX(), Objects.requireNonNull(snakePosition.peekFirst()).getY());
                                         snakePosition.removeFirst();
-
-                                        fillWithSnake(Objects.requireNonNull(snakePosition.peekLast()).getX(), Objects.requireNonNull(snakePosition.peekLast()).getY());
                                     }
+                                fillWithSnake(Objects.requireNonNull(snakePosition.peekLast()).getX(), Objects.requireNonNull(snakePosition.peekLast()).getY());
                                 } else {
                                 haveFailed = true;
                             }
@@ -119,17 +113,18 @@ public class ApplicationController {
         for (Position p : snakePosition) {
             fillWithSnake(p.getX(), p.getY());
         }
-        putDownFruit(fruitPosition.getX(), fruitPosition.getY());
+        for (int i = 0; i < gameBoard.getRowCount(); i++) {
+            for (int j = 0; j < gameBoard.getColumnCount(); j++) {
+                allPositions.add(new Position(i, j));
+            }
+        }
+        putDownFruit();
     }
 
     private void fillStartingPosition() {
-        snakePosition.add(new Position(2, 9));
-        snakePosition.add(new Position(3, 9));
-        snakePosition.add(new Position(4, 9));
-    }
-
-    private int generatePosition() {
-        return random.nextInt(0, gameBoard.getColumnCount());
+        snakePosition.add(new Position(2, 6));
+        snakePosition.add(new Position(3, 6));
+        snakePosition.add(new Position(4, 6));
     }
 
     public static void setLastKeyDown(KeyCode keyCodeToBeSet) {
@@ -162,14 +157,41 @@ public class ApplicationController {
         gameBoard.add(snakeGraphic, x, y);
     }
 
-    private void putDownFruit(int x, int y) {
+    private void putDownFruit() {
         Circle fruit = new Circle(100, 100, cellSize/2);
         fruit.setFill(Color.WHITE);
-        gameBoard.add(fruit, x, y);
+
+        System.out.println("SNAKEPOSITIONS:---------------------------");
+        for (Position p : snakePosition) {
+            System.out.println(p.getX() + " " + p.getY());
+        }
+
+        System.out.println("REMOVED POSITIONS FROM ALL");
+        List<Position> availablePositionsList = new ArrayList<>(allPositions);
+        for (Position p : snakePosition) {
+            System.out.println(p.getX() + " " + p.getY());
+            availablePositionsList.remove(p);
+        }
+
+        System.out.println("AVAILABLE POSITIONS:---------------------------");
+        for (Position p : availablePositionsList) {
+            System.out.println(p.getX() + " " + p.getY());
+        }
+
+        if (!availablePositionsList.isEmpty()) {
+            Position current = availablePositionsList.get(random.nextInt(availablePositionsList.size()));
+            fruitPosition.setPosition(current.getX(), current.getY());
+            gameBoard.add(fruit, current.getX(), current.getY());
+        }
     }
 
+
     private void clearCell(int x, int y) {
-        gameBoard.getChildren().removeIf(node ->
-                GridPane.getRowIndex(node) == y && GridPane.getColumnIndex(node) == x);
+        gameBoard.getChildren().removeIf(node -> {
+            Integer rowIndex = GridPane.getRowIndex(node);
+            Integer colIndex = GridPane.getColumnIndex(node);
+            return rowIndex != null && colIndex != null && rowIndex == y && colIndex == x;
+        });
     }
+
 }

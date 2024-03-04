@@ -165,21 +165,9 @@ public class ApplicationController {
         Circle fruit = new Circle(100, 100, cellSize/2);
         fruit.setFill(Color.WHITE);
 
-        System.out.println("SNAKEPOSITIONS:---------------------------");
-        for (Position p : snakePosition) {
-            System.out.println(p.getX() + " " + p.getY());
-        }
-
-        System.out.println("REMOVED POSITIONS FROM ALL");
         List<Position> availablePositionsList = new ArrayList<>(allPositions);
         for (Position p : snakePosition) {
-            System.out.println(p.getX() + " " + p.getY());
             availablePositionsList.remove(p);
-        }
-
-        System.out.println("AVAILABLE POSITIONS:---------------------------");
-        for (Position p : availablePositionsList) {
-            System.out.println(p.getX() + " " + p.getY());
         }
 
         if (!availablePositionsList.isEmpty()) {

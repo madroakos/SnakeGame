@@ -7,6 +7,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
@@ -20,6 +21,8 @@ public class ApplicationController {
     private Button startButton;
     @FXML
     private Label pointLabel;
+    @FXML
+    private Pane welcomePane;
     private final Deque<Position> snakePosition = new ArrayDeque<>();
     private final Position fruitPosition = new Position(5, 5);
     private double cellSize;
@@ -37,7 +40,8 @@ public class ApplicationController {
     @FXML
     private void onStartButtonClick() {
         cellSize = gameBoard.getWidth() / gameBoard.getColumnCount();
-        startButton.setVisible(false);
+        welcomePane.setDisable(true);
+        welcomePane.setOpacity(0);
         paintStartingPositions();
         startGame();
     }
